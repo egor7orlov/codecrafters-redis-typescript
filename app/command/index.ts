@@ -1,5 +1,6 @@
 import {KnownCommand} from "./types";
-import {COMMAND_HANDLERS, KNOWN_COMMANDS, CRLF} from "./constants";
+import {COMMAND_HANDLERS, KNOWN_COMMANDS} from "./constants";
+import {RedisProtocol} from "../redis-protocol";
 
 export class Command {
     private constructor(
@@ -12,19 +13,11 @@ export class Command {
      * Parse a string input formatted according to Redis protocol into a Command instance.
      * Refer to https://redis.io/docs/latest/develop/reference/protocol-spec/ for more information.
      */
-    static parse(input: string): Command | undefined {
-        const splitInput = input.toLowerCase().split(CRLF).filter(Boolean);
-        const [arraySize, ...entries] = splitInput;
-        const [commandName, ...args]: string[] = entries.reduce((acc, entry, index) => {
-            if (index % 2 !== 0) {
-                acc.push(entry);
-            }
-
-            return acc;
-        }, [] as string[]);
+    static parse(input: string): Command {
+        const [commandName, ...args]: string[] = RedisProtocol.parseArray(input);
 
         if (!KNOWN_COMMANDS.includes(commandName as KnownCommand)) {
-            return;
+            throw new Error(`Unknown command '${commandName}'`);
         }
 
         return new Command(commandName as KnownCommand, args);
