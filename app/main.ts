@@ -6,7 +6,7 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
         const commands = dataStr.split("\r\n").filter((command) => command !== "");
 
         commands.forEach(() => {
-            connection.end("+PONG\r\n");
+            connection.write("+PONG\r\n");
         });
     });
 });
