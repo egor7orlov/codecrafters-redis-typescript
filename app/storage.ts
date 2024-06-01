@@ -8,6 +8,12 @@ class Storage {
     set(key: string, value: string): void {
         this.storage[key] = value;
     }
+
+    expireInMillis(key: string, millis: number): void {
+        setTimeout(() => {
+            delete this.storage[key];
+        }, millis);
+    }
 }
 
 export const storage = new Storage();

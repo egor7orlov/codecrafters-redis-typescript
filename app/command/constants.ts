@@ -11,8 +11,18 @@ export const COMMAND_HANDLERS: Record<KnownCommand, CommandHandler> = {
     "ping": async (args: string[]) => {
         return RedisProtocol.encodeSuccessfulResponse("PONG");
     },
-    "set": async ([key, value]: string[]) => {
-        storage.set(key, value);
+    "set": async ([key, ...args]: string[]) => {
+        const indexOfPx = args.indexOf("px");
+
+        if (indexOfPx === -1) {
+            storage.set(key, args.join(' '));
+        } else {
+            const value = args.slice(0, indexOfPx).join(' ');
+            storage.set(key, value);
+
+            const millis = parseInt(args[indexOfPx + 1]);
+            storage.expireInMillis(key, millis);
+        }
 
         return RedisProtocol.encodeSuccessfulResponse("OK");
     },
@@ -20,7 +30,7 @@ export const COMMAND_HANDLERS: Record<KnownCommand, CommandHandler> = {
         const value = storage.get(key);
 
         if (!value) {
-            return RedisProtocol.NULL_RESPONSE;
+            return RedisProtocol.NULL_STR;
         }
 
         return RedisProtocol.encodeString(value);

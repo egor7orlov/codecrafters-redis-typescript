@@ -5,7 +5,7 @@
 export class RedisProtocol {
     public static CRLF = "\r\n";
 
-    public static NULL_RESPONSE = `$-1${RedisProtocol.CRLF}`;
+    public static NULL_STR = `$-1${RedisProtocol.CRLF}`;
 
     public static parseArray(input: string): string[] {
         const splitInput = input.toLowerCase().split(RedisProtocol.CRLF).filter(Boolean);
