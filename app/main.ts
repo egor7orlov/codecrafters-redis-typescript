@@ -1,6 +1,13 @@
 import "./storage";
 import * as net from "net";
 import {Command} from "./command";
+import {Command as ProgramArgs} from "commander";
+
+const programArgs = new ProgramArgs();
+
+programArgs
+    .option("-p, --port <number>", "Port to listen to", "6379")
+    .parse(process.argv);
 
 const server: net.Server = net.createServer((connection: net.Socket) => {
     connection.on("data", async (data: Buffer) => {
@@ -16,4 +23,4 @@ const server: net.Server = net.createServer((connection: net.Socket) => {
     });
 });
 
-server.listen(6379, "127.0.0.1");
+server.listen(+programArgs.opts().port, "127.0.0.1");
